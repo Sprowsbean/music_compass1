@@ -73,6 +73,7 @@ Rules:
 - Weave in the zodiac naturally — confirm or surprise with the music data.
 - Each section: one fun nickname title + 3-5 short punchy sentences.
 - End with something that makes them smile and nod.
+- NEVER mention any artist names or song titles.
 Return only valid JSON. No markdown. No preamble."""
 
 
