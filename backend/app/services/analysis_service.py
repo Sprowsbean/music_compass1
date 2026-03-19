@@ -401,32 +401,27 @@ yet true for almost anyone who recognizes themselves in it. This is the Barnum-F
 
 Use the data above as your raw intelligence. Never name a metric. Translate everything into human behavior.
 {zodiac_instruction}
-STRUCTURE — four paragraphs, second person ("you") throughout:
+STRUCTURE — four sections, each with a fun nickname title + 3-5 short sentences.
+Write casually, like a friend texting you your personality results. Simple words only.
 
-Paragraph 1 — AMBITION & DRIVE:
-  Open with a Barnum statement that lands like a mirror — something universally true that feels personal.
-  Reveal how driven they are — not in obvious ways, but the hunger underneath the surface.
-  Use the regression slope direction: positive = building toward something, negative = quietly regrouping.
-  Let the zodiac's relationship to ambition and drive come through naturally in the language.
-  Example register: "Most people see the calm. They don't see what is running underneath it."
+Section 1 — give it a fun nickname (e.g. "The Quiet Planner"):
+  Use a simple fun analogy — Lego builder, chess player, gardener, etc.
+  Slope positive = leveling up lately. Slope negative = recharging on purpose.
+  3-4 short punchy sentences. No fancy words.
 
-Paragraph 2 — SOCIAL ENERGY & EMOTIONAL WORLD:
-  How do they show up around other people? What do people feel in their presence?
-  How much do they feel — and how much do they actually show?
-  R² near 1.0 → they know exactly who they are; near 0 → they contain multitudes, hard to predict.
-  Anchor with a Barnum truth: "You care more than you let on." or "People read you wrong, often."
-  Weave in the zodiac's social and emotional signature — loyalty, protectiveness, warmth, independence.
+Section 2 — give it a fun nickname (e.g. "The Safe Harbor"):
+  What kind of friend are they? Warm, simple comparison.
+  Mention loyalty and how they show up for people.
+  3-4 short punchy sentences.
 
-Paragraph 3 — UNDER PRESSURE:
-  This is where you reveal something they would not say at a party.
-  Do they go inward or outward when things get hard? Draw from the tension block and zodiac traits.
-  Be specific about how they handle pressure — do they get quiet, do they perform composure, do they push through?
-  Use phrasing like: "When the pressure builds..." or "Even the people closest to you..."
+Section 3 — give it a fun nickname (e.g. "The Cool Head"):
+  What do they do when things go wrong? Fun analogy — ship captain, duck on water.
+  3-4 short punchy sentences.
 
-Paragraph 4 — THE HIDDEN TRUTH:
-  The contradiction. The thing the data AND the zodiac together whisper that the person half-knows but has not said.
-  Make it feel like a revelation — specific, a little uncomfortable, completely true.
-  End on something that settles in slowly. The last sentence should feel like it was written only for them.
+Section 4 — give it a fun nickname (e.g. "The Brave Heart"):
+  The sweet surprise about them. Warm and honest.
+  End with something that makes them smile and nod.
+  3-4 short punchy sentences.
 
 BARNUM ANCHORS to weave naturally — pick the ones that fit, do not force all of them:
   "Most people do not see this in you."
