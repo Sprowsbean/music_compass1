@@ -1,0 +1,238 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Nebula design tokens ──────────────────────────────────── */
+:root {
+  --void:    #03010f;
+  --deep:    #070420;
+  --purple:  #1a0a3d;
+  --indigo:  #4f46e5;
+  --cyan:    #00e5ff;
+  --pink:    #f472b6;
+  --gold:    #fbbf24;
+  --star:    #e8e6ff;
+  --muted:   #4a4870;
+  --card-bg: rgba(7, 4, 28, 0.85);
+  --card-bd: rgba(79, 70, 229, 0.25);
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: var(--void);
+  color: var(--star);
+  font-family: 'DM Mono', 'Courier New', monospace;
+}
+
+/* ── Starfield background ──────────────────────────────────── */
+body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 15% 40%, rgba(79,70,229,0.10) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 40% at 85% 20%, rgba(244,114,182,0.07) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 50% at 55% 80%, rgba(0,229,255,0.05) 0%, transparent 100%);
+  background-attachment: fixed;
+}
+
+/* Stars as pseudo-random dots (pure CSS) */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at  8% 12%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22% 38%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 37%  7%, rgba(200,190,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 51% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 68% 22%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 83% 68%, rgba(200,220,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 14% 77%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 92%  9%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 47% 91%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 29% 62%, rgba(255,200,87,0.5)  0%, transparent 100%),
+    radial-gradient(1px 1px at 76% 44%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 61% 16%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at  5% 50%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 35%, rgba(200,190,255,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 43% 28%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 72% 85%, rgba(255,255,255,0.5) 0%, transparent 100%);
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Nebula card ────────────────────────────────────────────── */
+.nebula-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-bd);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 0 40px rgba(79,70,229,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 24px rgba(79,70,229,0.35);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(124,58,237,0.5);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 9px 20px;
+  color: var(--star);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(79,70,229,0.5);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #831843, #9d174d);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-danger:hover:not(:disabled) {
+  opacity: 0.85;
+}
+.btn-danger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Source badges ──────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+}
+.badge-kaggle  { background: rgba(0,229,255,0.12);  color: #00e5ff;  border: 1px solid rgba(0,229,255,0.3); }
+.badge-fuzzy   { background: rgba(251,191,36,0.12); color: #fbbf24;  border: 1px solid rgba(251,191,36,0.3); }
+.badge-gemini  { background: rgba(244,114,182,0.12);color: #f472b6;  border: 1px solid rgba(244,114,182,0.3); }
+.badge-default { background: rgba(255,255,255,0.06);color: #5a5880;  border: 1px solid rgba(255,255,255,0.1); }
+
+/* ── Nebula progress bar ────────────────────────────────────── */
+.progress-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #4f46e5, #00e5ff, #f472b6);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Upload drop zone ───────────────────────────────────────── */
+.drop-zone {
+  border: 1.5px dashed rgba(79,70,229,0.4);
+  border-radius: 12px;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: rgba(7,4,28,0.5);
+}
+.drop-zone:hover, .drop-zone.drag-active {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,0.04);
+  box-shadow: 0 0 30px rgba(0,229,255,0.1);
+}
+
+/* ── Misc animations ────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.fade-up { animation: fadeUp 0.4s ease both; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.4); }
+}
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track  { background: #080420; }
+::-webkit-scrollbar-thumb  { background: #3730a3; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+
+/* ── Input base ─────────────────────────────────────────────── */
+.nebula-input {
+  width: 100%;
+  background: rgba(7,4,28,0.9);
+  border: 1px solid rgba(79,70,229,0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--star);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.nebula-input:focus { border-color: var(--cyan); }
+.nebula-input::placeholder { color: #3a3860; }
+
+/* ── Section label ──────────────────────────────────────────── */
+.section-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.env
+
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# Data (do not commit large CSVs or cache)
+backend/data/cache/
+
+# IDE
+.vscode/
+.idea/
