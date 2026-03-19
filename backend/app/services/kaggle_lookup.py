@@ -46,6 +46,10 @@ def _resolve_path(env_var: str, default_relative: str) -> Path:
 
 KAGGLE_CSV_PATH  = _resolve_path("KAGGLE_CSV_PATH", "data/kaggle/dataset.csv")
 CACHE_PATH       = _resolve_path("CACHE_PATH",      "data/cache/score_cache.json")
+if not os.getenv("CACHE_PATH"):
+    CACHE_PATH = _BACKEND_DIR / "data" / "cache" / "score_cache.json"
+if not os.getenv("KAGGLE_CSV_PATH"):
+    KAGGLE_CSV_PATH = _BACKEND_DIR / "data" / "kaggle" / "dataset.csv"
 GEMINI_API_KEY   = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL     = os.getenv("GEMINI_MODEL",   "gemini-1.5-flash")
 
