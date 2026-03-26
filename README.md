@@ -20,7 +20,7 @@
 cd backend
 
 # Create virtualenv (recommended)
-python -m venv venv
+py -3.11 -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
 
 # Install dependencies
