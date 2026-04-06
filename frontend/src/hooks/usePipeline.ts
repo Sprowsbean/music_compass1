@@ -59,27 +59,27 @@ export function usePipeline() {
       // Step 1 – Parse history
       const parsed: ImportResult = await api.importSpotify(files, name);
 
-      // Step 2 – Score in chunks of 50
+      // Step 2 – Score all songs in one request.
+      // Chunking happens server-side; splitting here would cause multiple
+      // separate Gemini calls instead of one consolidated batch.
       setPhase('scoring');
-      const CHUNK   = 50;
-      const all     = parsed.songs;
-      const scored: ScoredSong[] = [];
+      setProgress({
+        phase:   'Scoring songs…',
+        current: 0,
+        total:   parsed.songs.length,
+        kaggle:  0,
+        gemini:  0,
+      });
 
-      for (let i = 0; i < all.length; i += CHUNK) {
-        const chunk   = all.slice(i, i + CHUNK);
-        const results = await api.lookupBatch(chunk, parsed.user_id);
-        scored.push(...results);
+      const scored: ScoredSong[] = await api.lookupBatch(parsed.songs, parsed.user_id);
 
-        const kaggle = scored.filter(s => s.source?.includes('kaggle')).length;
-        const gemini = scored.filter(s => s.source === 'gemini_predicted').length;
-        setProgress({
-          phase:   'Scoring songs…',
-          current: scored.length,
-          total:   all.length,
-          kaggle,
-          gemini,
-        });
-      }
+      setProgress({
+        phase:   'Scoring songs…',
+        current: scored.length,
+        total:   parsed.songs.length,
+        kaggle:  scored.filter(s => s.source?.includes('kaggle')).length,
+        gemini:  scored.filter(s => s.source === 'gemini_predicted').length,
+      });
 
       const color = USER_COLORS[users.length % USER_COLORS.length];
       const newUser: UserData = {
