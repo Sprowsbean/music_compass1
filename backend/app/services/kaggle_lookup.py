@@ -407,38 +407,64 @@ class SongLookupEngine:
     def lookup_batch(self, songs: list) -> list:
         """
         Optimized batch pipeline:
-          1. Filter songs below MIN_TOTAL_MS, cap at TOP_N_SONGS
-          2. Parallel cache + Kaggle lookups across 20 threads
-          3. Collect unknowns → send to Gemini in chunks of 50
-          4. Flush cache to disk once at the end
+          1. Deduplicate by (track, artist) — score each unique song once
+          2. Filter songs below MIN_TOTAL_MS, cap at TOP_N_SONGS
+          3. Parallel cache + Kaggle lookups across 20 threads
+          4. Collect ALL unknowns → send to Gemini in ONE batch (chunked if >50)
+          5. Fan results back out to original list positions
+          6. Flush cache to disk once at the end
 
-        Always returns a list the same length as input — filtered songs
+        Always returns a list the same length as input — filtered/duplicate songs
         get a default 0.5/0.5 entry rather than being dropped.
         """
         total_input = len(songs)
 
-        # ── Step 1: Filter & cap ──────────────────────────────────────────────
+        # ── Step 0: Deduplicate ───────────────────────────────────────────────
+        # Multiple entries for the same (track, artist) only need one API call.
+        # We score each unique key once and fan the result back to all positions.
+        seen_keys: dict = {}          # norm_key → first song object
+        dedup_indices: dict = {}      # norm_key → [list of original indices]
+        for i, s in enumerate(songs):
+            key = f"{normalize(s['track'])}|||{normalize(s['artist'])}"
+            dedup_indices.setdefault(key, []).append(i)
+            if key not in seen_keys:
+                seen_keys[key] = s
+
+        unique_songs = list(seen_keys.values())
+        log.info(f"Dedup: {total_input} input → {len(unique_songs)} unique songs")
+
+        # ── Step 1: Filter & cap (on unique songs only) ───────────────────────
         scored_set = set()
         to_score   = []
-        for s in sorted(songs, key=lambda x: x.get("total_ms", 0), reverse=True):
+        for s in sorted(unique_songs, key=lambda x: x.get("total_ms", 0), reverse=True):
             if s.get("total_ms", 0) >= MIN_TOTAL_MS and len(to_score) < TOP_N_SONGS:
                 to_score.append(s)
                 scored_set.add(id(s))
 
         log.info(
-            f"Batch filter: {total_input} input → "
+            f"Batch filter: {len(unique_songs)} unique → "
             f"{len(to_score)} to score, "
-            f"{total_input - len(to_score)} skipped (low playtime or capped)"
+            f"{len(unique_songs) - len(to_score)} skipped (low playtime or capped)"
         )
 
-        # Build index map so we can place results back in original order
-        id_to_original_idx = {id(s): i for i, s in enumerate(songs)}
-        results = [None] * total_input
+        results        = [None] * total_input
+        # unique_result[norm_key] → scored dict, filled as we go
+        unique_result: dict = {}
 
-        # Default-fill everything not being scored
-        for s in songs:
+        def _fan_out():
+            """Copy every resolved unique result back to all original positions."""
+            for key, indices in dedup_indices.items():
+                r = unique_result.get(key)
+                if r is not None:
+                    for idx in indices:
+                        # Preserve the original song's total_ms at each position
+                        results[idx] = {**r, "total_ms": songs[idx].get("total_ms", 0)}
+
+        # Default-fill unique songs that were filtered out
+        for s in unique_songs:
+            key = f"{normalize(s['track'])}|||{normalize(s['artist'])}"
             if id(s) not in scored_set:
-                results[id_to_original_idx[id(s)]] = self._build(
+                unique_result[key] = self._build(
                     s["track"], s["artist"], s.get("total_ms", 0),
                     0.5, 0.5, SOURCE_DEFAULT, "unknown"
                 )
@@ -452,7 +478,7 @@ class SongLookupEngine:
 
             cached = self.cache.get(cache_key)
             if cached:
-                return song, {**cached, "track": song["track"],
+                return song, cache_key, {**cached, "track": song["track"],
                               "artist": song["artist"],
                               "total_ms": song.get("total_ms", 0)}
 
@@ -462,7 +488,7 @@ class SongLookupEngine:
                                 exact["energy"], exact["valence"],
                                 SOURCE_EXACT, exact["genre"])
                 self.cache.set(cache_key, r)
-                return song, r
+                return song, cache_key, r
 
             fuzzy = self.kaggle.fuzzy_lookup(norm)
             if fuzzy:
@@ -472,27 +498,24 @@ class SongLookupEngine:
                                 SOURCE_FUZZY, entry["genre"],
                                 match_score=score, matched_key=matched)
                 self.cache.set(cache_key, r)
-                return song, r
+                return song, cache_key, r
 
-            return song, None  # needs Gemini
+            return song, cache_key, None  # needs Gemini
 
         completed = 0
         with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as executor:
             futures = {executor.submit(_fast_lookup, s): s for s in to_score}
             for future in as_completed(futures):
-                song, result = future.result()
-                completed   += 1
+                song, cache_key, result = future.result()
+                completed += 1
                 if result:
-                    results[id_to_original_idx[id(song)]] = result
+                    unique_result[cache_key] = result
                 else:
                     genre = self.kaggle.detect_genre(song["artist"])
                     unknowns.append({
                         **song,
                         "genre":      genre,
-                        "_cache_key": (
-                            f"{normalize(song['track'])}|||{normalize(song['artist'])}"
-                        ),
-                        "_orig_idx":  id_to_original_idx[id(song)],
+                        "_cache_key": cache_key,
                     })
                 if completed % 100 == 0:
                     log.info(
@@ -502,7 +525,8 @@ class SongLookupEngine:
 
         log.info(f"Fast lookup complete. {len(unknowns)} songs need Gemini.")
 
-        # ── Step 3: Batch Gemini for unknowns ────────────────────────────────
+        # ── Step 3: ONE Gemini batch for all unknowns ─────────────────────────
+        # All cache+Kaggle work is finished. Now send every unknown in one pass.
         for chunk_start in range(0, len(unknowns), GEMINI_CHUNK):
             chunk = unknowns[chunk_start: chunk_start + GEMINI_CHUNK]
             preds = self.gemini.predict_batch(chunk)
@@ -521,14 +545,17 @@ class SongLookupEngine:
                                     0.5, 0.5, SOURCE_DEFAULT, "unknown")
 
                 self.cache.set(song["_cache_key"], r)
-                results[song["_orig_idx"]] = r
+                unique_result[song["_cache_key"]] = r
 
             log.info(
                 f"Gemini batch: "
                 f"{min(chunk_start + GEMINI_CHUNK, len(unknowns))}/{len(unknowns)} done"
             )
 
-        # ── Step 4: Flush cache once ──────────────────────────────────────────
+        # ── Step 4: Fan unique results back to all original positions ─────────
+        _fan_out()
+
+        # ── Step 5: Flush cache once ──────────────────────────────────────────
         self.cache.flush()
 
         # Safety net: fill any remaining None slots
