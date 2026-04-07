@@ -31,7 +31,7 @@ export interface ScoredSong {
   total_ms:    number;
   energy:      number | null;
   valence:     number | null;
-  source:      'kaggle_exact' | 'kaggle_fuzzy' | 'gemini_predicted' | 'default';
+  source:      'kaggle_exact' | 'kaggle_fuzzy' | 'supabase_cache' | 'gemini_predicted' | 'default';
   genre:       string;
   match_score: number | null;
   matched_key: string | null;
